@@ -41,10 +41,11 @@
 static const char * date(void);
 //static const char * getuname(void);
 static const char * ram(void);
+static const char * battery(void);
 static void XSetRoot(const char *name);
 /*Append here your functions.*/
 static const char*(*const functab[])(void)={
-        ram,date
+        ram,battery,date
 };
 
 int main(void){
@@ -96,6 +97,31 @@ static const char * ram(void){
         return ram;
 }
 
+static const char *battery(void) {
+  static const char ENERGY_NOW[] = "/sys/class/power_supply/BAT0/energy_now";
+  static const char ENERGY_FULL[] = "/sys/class/power_supply/BAT0/energy_full";
+  static char battery[MAXSTR];
+  long energy_full, energy_now;
+
+  FILE *fd = fopen(ENERGY_FULL, "r");
+  if (fd) {
+    fscanf(fd, "%ld", &energy_full);
+    fclose(fd);
+
+    fd = fopen(ENERGY_NOW, "r");
+    if(fd) {
+      fscanf(fd, "%ld", &energy_now);
+      fclose(fd);
+
+      snprintf(battery, sizeof(battery), "Battery: %.1lf%%", 100.0*((double)energy_now) / ((double)energy_full)) ;
+    } else {
+      snprintf(battery, sizeof(battery), "Error opening %s", ENERGY_NOW);
+    }
+  } else {
+    snprintf(battery, sizeof(battery), "Error opening %s", ENERGY_FULL);
+  }
+  return battery;
+}
 static void XSetRoot(const char *name){
         Display *display;
 
