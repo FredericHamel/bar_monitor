@@ -45,56 +45,56 @@ static const char * battery(void);
 static void XSetRoot(const char *name);
 /*Append here your functions.*/
 static const char*(*const functab[])(void)={
-        ram,battery,date
+  ram,battery,date
 };
 
 int main(void){
-        char status[MAXSTR];
-        /* It is foolish to repeatedly update uname. */
-        int ret;
-        {
-          struct utsname u;
-          if(uname(&u)){
-            perror("uname failed");
-            return 1;
-        }
-        ret=snprintf(status,sizeof(status),"(%s %s %s) ",u.sysname,u.nodename,u.release);}
-        char*off=status+ret;
-        if(off>=(status+MAXSTR)){
-                XSetRoot(status);
-                return 1;/*This should not happen*/
-        }
-        for(;;){
-                int left=sizeof(status)-ret,i;
-                char*sta=off;
-                for(i = 0; i<sizeof(functab)/sizeof(functab[0]); ++i ) {
-                        int ret=snprintf(sta,left,"(%s) ",functab[i]());
-                        sta+=ret;
-                        left-=ret;
-                        if(sta>=(status+MAXSTR))/*When snprintf has to resort to truncating a string it will return the length as if it were not truncated.*/
-                                break;
-                }
-                XSetRoot(status);
-                sleep(1);
-        }
-        return 0;
+  char status[MAXSTR];
+  /* It is foolish to repeatedly update uname. */
+  int ret;
+  {
+    struct utsname u;
+    if(uname(&u)){
+      perror("uname failed");
+      return 1;
+    }
+    ret=snprintf(status,sizeof(status),"(%s %s %s) ",u.sysname,u.nodename,u.release);}
+  char*off=status+ret;
+  if(off>=(status+MAXSTR)){
+    XSetRoot(status);
+    return 1;/*This should not happen*/
+  }
+  for(;;){
+    int left=sizeof(status)-ret,i;
+    char*sta=off;
+    for(i = 0; i<sizeof(functab)/sizeof(functab[0]); ++i ) {
+      int ret=snprintf(sta,left,"(%s) ",functab[i]());
+      sta+=ret;
+      left-=ret;
+      if(sta>=(status+MAXSTR))/*When snprintf has to resort to truncating a string it will return the length as if it were not truncated.*/
+        break;
+    }
+    XSetRoot(status);
+    sleep(1);
+  }
+  return 0;
 }
 
 /* Returns the date*/
 static const char * date(void){
-        static char date[MAXSTR];
-        time_t now = time(0);
+  static char date[MAXSTR];
+  time_t now = time(0);
 
-        strftime(date, MAXSTR, TIME_FORMAT, localtime(&now));
-        return date;
+  strftime(date, MAXSTR, TIME_FORMAT, localtime(&now));
+  return date;
 }
 /* Returns a string that contains the amount of free and available ram in megabytes*/
 static const char * ram(void){
-        static char ram[MAXSTR];
-        struct sysinfo s;
-        sysinfo(&s);
-        snprintf(ram,sizeof(ram),"%.1fM,%.1fM",((double)(s.totalram-s.freeram))/1048576.,((double)s.totalram)/1048576.);
-        return ram;
+  static char ram[MAXSTR];
+  struct sysinfo s;
+  sysinfo(&s);
+  snprintf(ram,sizeof(ram),"%.1fM,%.1fM",((double)(s.totalram-s.freeram))/1048576.,((double)s.totalram)/1048576.);
+  return ram;
 }
 
 static const char *battery(void) {
@@ -123,16 +123,16 @@ static const char *battery(void) {
   return battery;
 }
 static void XSetRoot(const char *name){
-        Display *display;
+  Display *display;
 
-        if (( display = XOpenDisplay(0x0)) == NULL ) {
-                fprintf(stderr, "[barM] cannot open display!\n");
-                exit(1);
-        }
+  if (( display = XOpenDisplay(0x0)) == NULL ) {
+    fprintf(stderr, "[barM] cannot open display!\n");
+    exit(1);
+  }
 
-        XStoreName(display, DefaultRootWindow(display), name);
-        XSync(display, 0);
+  XStoreName(display, DefaultRootWindow(display), name);
+  XSync(display, 0);
 
-        XCloseDisplay(display);
+  XCloseDisplay(display);
 }
 
