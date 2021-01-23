@@ -113,7 +113,7 @@ static const char *battery(void) {
       fscanf(fd, "%ld", &energy_now);
       fclose(fd);
 
-      snprintf(battery, sizeof(battery), "Battery: %.1lf%%", 100.0*((double)energy_now) / ((double)energy_full)) ;
+      snprintf(battery, sizeof(battery), "🔋: %.1lf%%", 100.0*((double)energy_now) / ((double)energy_full)) ;
     } else {
       snprintf(battery, sizeof(battery), "Error opening %s", ENERGY_NOW);
     }
